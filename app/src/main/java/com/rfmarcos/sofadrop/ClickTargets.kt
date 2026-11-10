@@ -11,6 +11,8 @@ import androidx.core.net.toUri
  */
 object ClickTargets {
     private const val YOUTUBE_TV = "com.google.android.youtube.tv"
+    /** TizenTube Cobalt (ad-free YouTube TV client): takes youtube.com/watch links like YouTube's own app. */
+    private const val TIZENTUBE = "io.gh.reisxd.tizentube.cobalt"
 
     /**
      * The apps installed on the TV, looked up once for a whole set ([candidates] of a hundred wallpapers
@@ -22,7 +24,10 @@ object ClickTargets {
 
         fun of(platform: Platform): String? = packages.cached(platform) { platform.installedPackage(context) }
         fun of(app: TitleApp): String? = packages.cached(app) { app.installedPackage(context) }
-        val youTube: Boolean by lazy { runCatching { context.packageManager.getPackageInfo(YOUTUBE_TV, 0) }.isSuccess }
+        /** The app that plays trailers: TizenTube when installed, else YouTube for Android TV, else null. */
+        val youTube: String? by lazy {
+            listOf(TIZENTUBE, YOUTUBE_TV).firstOrNull { runCatching { context.packageManager.getPackageInfo(it, 0) }.isSuccess }
+        }
 
         /** An installed app takes [intent]; links of one app and kind are taken alike. */
         fun opens(intent: Intent): Boolean {
@@ -45,7 +50,7 @@ object ClickTargets {
         val trailer = wallpaper.trailerKey?.takeIf { fallback != Settings.CLICK_NONE }?.let { key ->
             // Several apps open YouTube links on a TV (browsers, Downloader…): YouTube's own, without asking
             Intent(Intent.ACTION_VIEW, "https://www.youtube.com/watch?v=$key".toUri())
-                .apply { if (apps.youTube) setPackage(YOUTUBE_TV) }
+                .apply { apps.youTube?.let { setPackage(it) } }
         }
         // An app that doesn't take that kind of link would fail silently. Not the trailer: whatever opens
         // YouTube links (its phone app, a browser) is hidden from Sofadrop, and something always does

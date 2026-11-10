@@ -35,6 +35,7 @@
         <package android:name="com.stremio.one" />
         <package android:name="org.jellyfin.androidtv" />
         <package android:name="com.google.android.youtube.tv" />
+        <package android:name="io.gh.reisxd.tizentube.cobalt" />
         <!-- Streaming platforms (Platform) -->
         <package android:name="com.netflix.ninja" />
         <package android:name="com.netflix.mediaclient" />
