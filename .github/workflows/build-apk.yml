@@ -13,8 +13,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
-      - uses: android-actions/setup-android@v3
+          java-version: 21
       - name: Write local.properties
         run: |
           echo "tmdb.token=${{ secrets.TMDB_TOKEN }}" > local.properties
